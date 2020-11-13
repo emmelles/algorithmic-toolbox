@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Nov  2 20:11:04 2020
+
+@author: mls
+"""
+
+import random
+import time
+
+size=int(input("Size of testing dataset:"))
+maxn=int(input("Max value of entry in dataset:"))
+
+def genDataset(sz, mn):
+    dataset=[]
+    for i in range(0,sz):
+        dataset.append(random.randint(0,maxn))
+    return dataset
+        
+def maxPair(ls):
+    currentpair=[ls[0],ls[1]]
+    currentpair.sort()
+    # want to have a list of two running max, with lower always first, which we replace with greater
+    for i in range(2,len(ls)):
+        if ls[i]>currentpair[0]:
+            currentpair[0]=ls[i]
+            currentpair.sort()
+    return currentpair
+
+'''
+the point of the lesson is various testing, menial>int overflow>max test>stress test, 
+so need to compare to a brute force approach; max is fine cos int in python is
+arbitraty precision
+'''
+
+def bruteForceMaxPair(ls):
+    prod=0
+    #double for loop, just iterating over all products:  
+    for i in range(len(ls)):
+            for j in range(i+1,len(ls)):
+                #iterating over the data twice, the second going from the i+1 forward cos already tested before
+                if ls[i]*ls[j]>prod:
+                    prod=ls[i]*ls[j]
+    return prod
+
+
+'''
+From lesson: "So what is stress testing? 
+In general, it is a program that generates random tests in an infinite loop, and
+for each test, it launches your solution on this test and
+an alternative solution on the same test and compares the result."
+Could run this but it's just calling genDataset with various arguments and
+my pc is absurdly slow, generates the max size in 300+ seconds.
+'''
+
+test=genDataset(size, maxn)
+#print(test)
+
+bfstart=time.time()
+bfmaxproduct=bruteForceMaxPair(test)
+bfend=time.time()
+print("Brute force max product is",bfmaxproduct, "executed in", bfend-bfstart,"s")
+
+maxpairstart=time.time()
+maxPairProduct=maxPair(test)[0]*maxPair(test)[1]
+maxpairend=time.time()
+
+print(maxPairProduct,"which is a product of",maxPair(test)[0],"and",maxPair(test)[1], "executed in", maxpairend-maxpairstart,"s")
